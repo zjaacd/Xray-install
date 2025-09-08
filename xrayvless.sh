@@ -6,7 +6,7 @@ green() { echo -e "\033[32m$1\033[0m"; }
 red()   { echo -e "\033[31m$1\033[0m"; }
 
 #====== 安装依赖 ======
-sudo apt update >/dev/null 2>&1
+sudo apt update -y >/dev/null 2>&1
 sudo apt install -y curl wget xz-utils jq xxd >/dev/null 2>&1
 
 #====== 检测并安装 Xray ======
@@ -25,20 +25,21 @@ check_and_install_xray() {
   fi
 }
 
-#====== 安装并配置 VLESS Reality 节点 ======
+#====== 安装并配置 VLESS Reality 节点（全自动一键） ======
 install_vless_reality() {
   check_and_install_xray
   XRAY_BIN=$(command -v xray || echo "/usr/local/bin/xray")
 
-  read -rp "监听端口（如 443）: " PORT
-  read -rp "节点备注: " REMARK
-
+  # 默认配置
+  PORT=443
+  REMARK="VLESSNode"
   UUID="123e4567-e89b-12d3-a456-426655440000"
+  SNI="www.cloudflare.com"
+  SHORT_ID=$(head -c 4 /dev/urandom | xxd -p)
+
   KEYS=$($XRAY_BIN x25519)
   PRIV_KEY=$(echo "$KEYS" | awk '/Private/ {print $3}')
   PUB_KEY=$(echo "$KEYS" | awk '/Public/ {print $3}')
-  SHORT_ID=$(head -c 4 /dev/urandom | xxd -p)
-  SNI="www.cloudflare.com"
 
   mkdir -p /usr/local/etc/xray
   cat > /usr/local/etc/xray/config.json <<EOF
@@ -74,7 +75,9 @@ EOF
 
   IP=$(curl -s ipv4.ip.sb || curl -s ifconfig.me)
   LINK="vless://$UUID@$IP:$PORT?type=tcp&security=reality&sni=$SNI&fp=chrome&pbk=$PUB_KEY&sid=$SHORT_ID#$REMARK"
-  green "✅ VLESS Reality 节点链接如下："
+
+  green "✅ VLESS Reality 节点已安装完成！"
+  green "🎯 节点链接如下："
   echo "$LINK"
 }
 
