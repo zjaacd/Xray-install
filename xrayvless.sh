@@ -25,7 +25,7 @@ check_and_install_xray() {
   fi
 }
 
-#====== 安装并配置 VLESS Reality 节点（全自动） ======
+#====== 安装并配置 VLESS Reality 节点（可用） ======
 install_vless_reality() {
   check_and_install_xray
   XRAY_BIN=$(command -v xray || echo "/usr/local/bin/xray")
@@ -35,11 +35,14 @@ install_vless_reality() {
   REMARK="VLESSNode"
   UUID="123e6666-e89b-12d3-a666-888888889999"
   SNI="www.cloudflare.com"
-  SHORT_ID=$(head -c 4 /dev/urandom | xxd -p)
 
+  # 生成 x25519 公私钥
   KEYS=$($XRAY_BIN x25519)
   PRIV_KEY=$(echo "$KEYS" | awk '/Private/ {print $3}')
   PUB_KEY=$(echo "$KEYS" | awk '/Public/ {print $3}')
+
+  # 生成 shortId（4 字节 hex）
+  SHORT_ID=$(head -c 4 /dev/urandom | xxd -p)
 
   mkdir -p /usr/local/etc/xray
   cat > /usr/local/etc/xray/config.json <<EOF
@@ -74,6 +77,8 @@ EOF
   systemctl enable xray
 
   IP=$(curl -s ipv4.ip.sb || curl -s ifconfig.me)
+
+  # ===== 原始可用节点链接格式 =====
   LINK="vless://$UUID@$IP:$PORT?type=tcp&security=reality&sni=$SNI&fp=chrome&pbk=$PUB_KEY&sid=$SHORT_ID#$REMARK"
 
   green "✅ VLESS Reality 节点已安装完成！"
