@@ -15,7 +15,7 @@ check_and_install_xray() {
     green "✅ Xray 已安装，跳过安装"
   else
     green "❗检测到 Xray 未安装，正在安装..."
-    bash <(curl -Ls https://github.com/XTLS/Xray-install/raw/main/install-release.sh)
+    bash <(curl -Ls https://github.com/zjaacd/Xray-install/raw/main/install-release.sh)
     XRAY_BIN=$(command -v xray || echo "/usr/local/bin/xray")
     if [ ! -x "$XRAY_BIN" ]; then
       red "❌ Xray 安装失败，请检查"
@@ -33,7 +33,7 @@ install_vless_reality() {
   read -rp "监听端口（如 443）: " PORT
   read -rp "节点备注: " REMARK
 
-  UUID=$(cat /proc/sys/kernel/random/uuid)
+  UUID="123e4567-e89b-12d3-a456-426655440000"
   KEYS=$($XRAY_BIN x25519)
   PRIV_KEY=$(echo "$KEYS" | awk '/Private/ {print $3}')
   PUB_KEY=$(echo "$KEYS" | awk '/Public/ {print $3}')
