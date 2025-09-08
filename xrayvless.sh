@@ -25,15 +25,15 @@ check_and_install_xray() {
   fi
 }
 
-#====== 安装并配置 VLESS Reality 节点（全自动一键） ======
+#====== 安装并配置 VLESS Reality 节点（全自动） ======
 install_vless_reality() {
   check_and_install_xray
   XRAY_BIN=$(command -v xray || echo "/usr/local/bin/xray")
 
-  # 默认配置
+  # ===== 默认参数 =====
   PORT=443
   REMARK="VLESSNode"
-  UUID="123e4567-e89b-12d3-a456-426655440000"
+  UUID="123e6666-e89b-12d3-a666-888888889999"
   SNI="www.cloudflare.com"
   SHORT_ID=$(head -c 4 /dev/urandom | xxd -p)
 
@@ -79,6 +79,10 @@ EOF
   green "✅ VLESS Reality 节点已安装完成！"
   green "🎯 节点链接如下："
   echo "$LINK"
+
+  # 可选：写入文件
+  echo "$LINK" > /root/vless_link.txt
+  green "📄 节点链接已保存到 /root/vless_link.txt"
 }
 
 #====== 执行 ======
